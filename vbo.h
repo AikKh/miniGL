@@ -4,9 +4,13 @@
 
 class VBO : public Bindable {
 public:
-	VBO(GLfloat* vertices, GLsizeiptr size, GLuint draw = GL_STATIC_DRAW)
+	VBO()
 	{
 		glGenBuffers(1, &_id);
+	}
+
+	void SetVertices(GLfloat* vertices, GLsizeiptr size, GLuint draw = GL_STATIC_DRAW)
+	{
 		Bind();
 		glBufferData(GL_ARRAY_BUFFER, size, vertices, draw);
 	}
@@ -16,12 +20,12 @@ public:
 		return _id;
 	}
 
-	void Bind() override
+	void Bind() const override
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, _id);
 	}
 
-	void Unbind() override
+	void Unbind() const override
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}

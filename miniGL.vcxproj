@@ -135,17 +135,32 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="application.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="scene.h" />
+    <ClCompile Include="shader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="application.h" />
     <ClInclude Include="bindable.h" />
+    <ClInclude Include="camera.h" />
     <ClInclude Include="ebo.h" />
     <ClInclude Include="includes.h" />
+    <ClInclude Include="light.h" />
+    <ClInclude Include="loader.h" />
     <ClInclude Include="mesh.h" />
+    <ClInclude Include="object.h" />
+    <ClInclude Include="renderer.h" />
+    <ClInclude Include="shader.h" />
     <ClInclude Include="transform.h" />
     <ClInclude Include="vao.h" />
     <ClInclude Include="vbo.h" />
+    <ClInclude Include="window.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shader.frag" />
+    <None Include="shader.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

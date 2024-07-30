@@ -4,12 +4,15 @@
 
 class EBO : public Bindable {
 public:
-	// Constructor that generates a Elements Buffer Object and links it to indices
-	EBO(GLuint* indices, GLsizeiptr size)
+	EBO()
 	{
 		glGenBuffers(1, &_id);
+	}
+
+	void SetIndices(GLuint* indices, GLsizeiptr size, GLuint draw = GL_STATIC_DRAW)
+	{
 		Bind();
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, indices, GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, indices, draw);
 	}
 
 	GLuint GetID() const
@@ -17,12 +20,12 @@ public:
 		return _id;
 	}
 
-	void Bind() override
+	void Bind() const override
 	{
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _id);
 	}
 
-	void Unbind() override
+	void Unbind() const override
 	{
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}

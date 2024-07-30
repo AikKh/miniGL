@@ -15,7 +15,7 @@ public:
 		return _id;
 	}
 
-	void LinkAttribute(VBO& VBO, GLuint layout, GLuint numComponents, GLenum type, GLsizeiptr stride, void* offset)
+	void LinkAttribute(VBO& VBO, GLuint layout, GLuint numComponents, GLenum type, GLsizei stride, void* offset)
 	{
 		VBO.Bind();
 		glVertexAttribPointer(layout, numComponents, type, GL_FALSE, stride, offset);
@@ -23,13 +23,13 @@ public:
 		VBO.Unbind();
 	}
 
-	void Bind()
+	void Bind() const
 	{
 		glBindVertexArray(_id);
 	}
 
 	// Unbinds the VAO
-	void Unbind()
+	void Unbind() const
 	{
 		glBindVertexArray(0);
 	}

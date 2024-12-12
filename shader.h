@@ -1,7 +1,13 @@
 #pragma once
 
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
 #include "bindable.h"
-#include "includes.h"
 
 class Shader : public Bindable {
 public:
@@ -12,6 +18,7 @@ public:
 
     void Bind() const override
     {
+        //std::cout << _id << std::endl;
         glUseProgram(_id);
     }
 

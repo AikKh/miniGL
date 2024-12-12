@@ -10,8 +10,8 @@ public:
 	iterator begin() { return m_objects.begin(); }
 	iterator end() { return m_objects.end(); }
 
-	const_iterator begin() const { return m_objects.begin(); }
-	const_iterator end() const { return m_objects.end(); }
+	const_iterator begin() const { return m_objects.cbegin(); }
+	const_iterator end() const { return m_objects.cend(); }
 
 	void Add(Object object)
 	{

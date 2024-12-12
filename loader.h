@@ -1,17 +1,36 @@
 #pragma once
 
-#include "mesh.h"
+#include "utils.h"
 
 class Loader {
 public:
-    Mesh LoadOBJ(const std::string& filename)
+
+    Mesh Load(const std::string& filename, std::vector<BufferDataType> types, bool ebo_use)
     {
         std::vector<glm::vec3> vertices;
         std::vector<glm::vec3> normals;
-        std::vector<glm::vec2> texCoords;
+        std::vector<glm::vec2> texture_coords;
         std::vector<std::tuple<FaceIndex, FaceIndex, FaceIndex>> faces;
 
-        std::ifstream file(filename);
+        LoadOBJ(filename, vertices, normals, texture_coords, faces);
+
+        if (ebo_use)
+        {
+            return Utils::WithEBO(vertices, normals, texture_coords, faces, types);
+        }
+        return Utils::WithoutEBO(vertices, normals, texture_coords, faces, types);
+    }
+
+private: 
+    void LoadOBJ(
+        const std::string& filename, 
+        std::vector<glm::vec3>& vertices, 
+        std::vector<glm::vec3>& normals,
+        std::vector<glm::vec2>& texture_coords,
+        std::vector<std::tuple<FaceIndex, FaceIndex, FaceIndex>>& faces)
+    {
+
+        std::ifstream file{ filename };
         if (!file.is_open())
         {
             throw std::runtime_error("Error: Could not open file ");
@@ -34,7 +53,7 @@ public:
             {
                 glm::vec2 texCoord{};
                 ss >> texCoord.x >> texCoord.y;
-                texCoords.push_back(texCoord);
+                texture_coords.push_back(texCoord);
             }
             else if (prefix == "vn")
             {
@@ -88,8 +107,5 @@ public:
             }
         }
         file.close();
-
-        return { vertices, normals, texCoords, faces };
     }
-
 };

@@ -1,28 +1,37 @@
 #pragma once
 
-#include "includes.h"
+#include <string>
 
-enum CameraMovement {
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+enum class CameraDirection {
     FORWARD,
     BACKWARD,
     LEFT,
-    RIGHT
+    RIGHT,
+    UP,
+    DOWN,
 };
 
 namespace
 {
     const float YAW = -90.0f;
     const float PITCH = 0.0f;
-    const float SPEED = 10.0f;
+    const float SPEED = 12.0f;
     const float SENSITIVITY = 0.08f;
     const float ZOOM = 45.0f;
 }
 
 class Camera final {
 public:
-    Camera(int width, int height, glm::vec3 position = glm::vec3(0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH) :
+    Camera(int width, int height, float speed = SPEED, glm::vec3 position = glm::vec3(0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH) :
         m_position{ position }, m_world_up{ up }, m_yaw{ yaw }, m_pitch{ pitch },
-        m_speed{ SPEED }, m_mouse_sensitivity{ SENSITIVITY }, m_zoom{ ZOOM },
+        m_speed{ speed }, m_mouse_sensitivity{ SENSITIVITY }, m_zoom{ ZOOM },
         m_width{ width }, m_height{ height },
         m_last_x{ width / 2.0f }, m_last_y{ height / 2.0f }
     {
@@ -32,7 +41,6 @@ public:
         UpdateProjectionMatrix();
     }
 
-    friend class Application;
 
     const glm::mat4& GetViewMatrix() const&
     {
@@ -49,7 +57,7 @@ public:
         return m_projection_matrix;
     }
 
-    void UpdateProjectionMatrix(float range = 100.0f)
+    void UpdateProjectionMatrix(float range = 200.0f)
     {
         m_projection_matrix = glm::perspective(glm::radians(m_zoom), (float)m_width / (float)m_height, 0.1f, range);
     }
@@ -59,17 +67,35 @@ public:
         return m_zoom;
     }
 
-    void ProcessKeyboard(CameraMovement direction, float deltaTime)
+    void ProcessDirection(CameraDirection direction, float deltaTime)
     {
         float velocity = m_speed * deltaTime;
-        if (direction == FORWARD)
+        if (direction == CameraDirection::FORWARD)
+        {
             m_position += m_front * velocity;
-        if (direction == BACKWARD)
+        }
+        if (direction == CameraDirection::BACKWARD)
+        {
             m_position -= m_front * velocity;
-        if (direction == LEFT)
+        }
+        if (direction == CameraDirection::LEFT)
+        {
             m_position -= m_right * velocity;
-        if (direction == RIGHT)
+        }
+        if (direction == CameraDirection::RIGHT)
+        {
             m_position += m_right * velocity;
+        }
+        if (direction == CameraDirection::UP)
+        {
+            m_position += m_up * velocity;
+        }
+        if (direction == CameraDirection::DOWN)
+        {
+            m_position += -m_up * velocity;
+        }
+
+        UpdateViewMatrix();
     }
 
     void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true)
@@ -101,6 +127,24 @@ public:
             m_zoom = 1.0f;
         if (m_zoom > 45.0f)
             m_zoom = 45.0f;
+
+        UpdateProjectionMatrix();
+    }
+
+    void SetLastPosition(float x, float y)
+    {
+        m_last_x = x;
+        m_last_y = y;
+    }
+
+    bool FirstMove() const
+    {
+        return m_first_move;
+    }
+
+    void SetFirstMove(bool first)
+    {
+        m_first_move = first;
     }
 
     std::string ToString() const
@@ -150,8 +194,10 @@ private:
     float m_last_x;
     float m_last_y;
 
+    bool m_first_move = true;
     //bool m_view_updated;
     //bool m_projection_updated;
 
+    friend class Application;
 #pragma endregion
 };

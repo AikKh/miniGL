@@ -1,6 +1,12 @@
 #pragma once
+//#include "includes.h"
+#include <iostream>
+#include <vector>
+#include <functional>
 
-#include "includes.h"
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
 #include "camera.h"
 #include "scene.h"
 #include "light.h"
@@ -8,13 +14,12 @@
 class Window {
 public:
 	Window(int width, int height) : 
-		m_width{ width }, m_height{ height }, m_window {}
+		m_width{ width }, m_height{ height }, m_window {}, m_cursor_callback{ nullptr }
 	{
-		/*glfwMakeContextCurrent(m_window);*/
+		glfwMakeContextCurrent(m_window);
 		glfwSetFramebufferSizeCallback(m_window, framebufferSizeCallback);
 
 		// Capturing mouse
-		glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 		glfwSetCursorPos(m_window, width / 2.0, height / 2.0);
 	}
 
@@ -32,9 +37,9 @@ public:
 		return m_height;
 	}
 
-	void SetCursorPosCallback(GLFWcursorposfun func) const
+	void SetCursorPosCallback(GLFWcursorposfun func)
 	{
-		glfwSetCursorPosCallback(m_window, func);
+		m_cursor_callback = func;
 	}
 
 	void SetScrollCallback(GLFWscrollfun func) const
@@ -59,24 +64,26 @@ public:
 		glfwPollEvents();
 	}
 
-	void Draw(const Camera& camera, const Scene& scene, const Light& light) const
+	void Exit() const
 	{
-		for (const auto& object : scene)
-		{
-			object.Select();
+		glfwSetWindowShouldClose(m_window, true);
+	}
 
-			// Vertex
-			object.Renderer->SetMatrix4f("model", object.Transform->GetModelMatrix());
-			object.Renderer->SetMatrix4f("view", camera.GetViewMatrix());
-			object.Renderer->SetMatrix4f("projection", camera.GetProjectionMatrix());
-			object.Renderer->SetMatrix3f("transposedModel", object.Transform->GetTransposeModelMatrix());
+	void CaptureCursor() const
+	{
+		glfwSetCursorPosCallback(m_window, m_cursor_callback);
+		glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	}
 
-			// Fragmet
-			object.Renderer->SetVec3("lightPos", light.GetPosition());
+	void ReleaseCursor() const
+	{
+		glfwSetCursorPosCallback(m_window, nullptr);
+		glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	}
 
-			glDrawArrays(GL_TRIANGLES, 0, object.Mesh->FaceCount * 3); // Without EBO
-			// glDrawElements(GL_TRIANGLES, object.Mesh->FaceCount * 3, GL_UNSIGNED_INT, 0); // With EBO
-		}
+	GLFWwindow* GetPtr() const
+	{
+		return m_window;
 	}
 
 private:
@@ -89,4 +96,6 @@ private:
 	int m_width;
 	int m_height;
 	GLFWwindow* m_window;
+
+	GLFWcursorposfun m_cursor_callback;
 };
